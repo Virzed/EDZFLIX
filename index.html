@@ -45,7 +45,7 @@ body{background:#000;color:#fff;font-family:Arial;margin:0;padding:10px}
 </div>
 </div>
 <script>
-const API_KEY='488eb36776275b8ae18600751059f6d6f0e4b0d8e1';
+const API_KEY='488eb36776275b8ae18600751059f6d6';
 const IMG_URL='https://image.tmdb.org/t/p/w500';
 async function fetchContent(url){
 const res=await fetch(url);const data=await res.json();displayContent(data.results,document.getElementById(currentType==='tv'?'tv':'movies'))
