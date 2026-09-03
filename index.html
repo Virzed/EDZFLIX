@@ -74,15 +74,35 @@
       });
     }
 
-    function loadPlayer(id) {
-      const src =
-            currentType === 'movie'
-        ? `https://vidlink.pro/movie/${id}?primaryColor=1DB954&secondaryColor=000000&iconColor=e50914&icons=default&player=default&title=true&poster=true&autoplay=false&nextButton=false`
-        : `https://vidlink.pro/tv/${id}/1/1?primaryColor=1DB954&secondaryColor=000000&iconColor=e50914&icons=default&player=default&title=true&poster=true&autoplay=false&nextButton=false`
-      document.getElementById("iframePlayer").src = src;
-      document.getElementById("playerContainer").style.display = "flex";
-    }
-
+let currentMovieId = null;
+const servers = [
+  { name: "Server 1", url: (id, type) => type==='movie'? `https://vidlink.pro/movie/${id}?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` : `https://vidlink.pro/tv/${id}/1/1?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` },
+  { name: "Server 2", url: (id, type) => type==='movie'? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/1/1` },
+  { name: "Server 3", url: (id, type) => type==='movie'? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/1/1` }
+];
+let activeServer = 0;
+function changeServer(n){
+  activeServer = n;
+  const src = servers[n].url(currentMovieId, currentType);
+  document.getElementById("iframePlayer").src = src;
+  document.querySelectorAll('.server-btn').forEach((b,i)=>{ b.style.background = i===n? 'crimson' : '#333'; });
+}
+function loadPlayer(id) {
+  currentMovieId = id;
+  activeServer = 0;
+  const src = servers[0].url(id, currentType);
+  document.getElementById("iframePlayer").src = src;
+  document.getElementById("playerContainer").style.display = "flex";
+  if(!document.getElementById('serverTabs')){
+    const tabs = document.createElement('div');
+    tabs.id = 'serverTabs';
+    tabs.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-bottom:10px;';
+    tabs.innerHTML = servers.map((s,i)=>`<button class="server-btn" onclick="changeServer(${i})" style="background:${i===0?'crimson':'#333'};color:white;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;">${s.name}</button>`).join('');
+    document.getElementById("playerContainer").insertBefore(tabs, document.getElementById("iframePlayer"));
+  } else {
+    changeServer(0);
+  }
+}
     function closePlayer() {
       document.getElementById("playerContainer").style.display = "none";
       document.getElementById("iframePlayer").src = "";
