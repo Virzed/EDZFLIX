@@ -77,8 +77,8 @@
 let currentMovieId = null;
 const servers = [
   { name: "Server 1", url: (id, type) => type==='movie'? `https://vidlink.pro/movie/${id}?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` : `https://vidlink.pro/tv/${id}/1/1?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` },
-  { name: "Server 2", url: (id, type) => type==='movie'? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/1/1` },
-  { name: "Server 3", url: (id, type) => type==='movie'? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/1/1` }
+  { name: "Server 2", url: (id, type) => type==='movie'? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/1/1` },
+  { name: "Server 3", url: (id, type) => type==='movie'? `https://autoembed.co/movie/tmdb/${id}` : `https://autoembed.co/tv/tmdb/${id}-1-1` }
 ];
 let activeServer = 0;
 function changeServer(n){
