@@ -76,9 +76,9 @@
 
     function loadPlayer(id) {
       const src =
-        currentType === 'movie'
-          ? `https://autoembed.pro/embed/movie/${id}`
-          : `https://autoembed.pro/embed/tv/${id}`;
+            currentType === 'movie'
+        ? `https://vidlink.pro/movie/${id}?primaryColor=1DB954&secondaryColor=000000&iconColor=e50914&icons=default&player=default&title=true&poster=true&autoplay=false&nextButton=false`
+        : `https://vidlink.pro/tv/${id}/1/1?primaryColor=1DB954&secondaryColor=000000&iconColor=e50914&icons=default&player=default&title=true&poster=true&autoplay=false&nextButton=false`
       document.getElementById("iframePlayer").src = src;
       document.getElementById("playerContainer").style.display = "flex";
     }
