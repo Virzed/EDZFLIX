@@ -1,138 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>EDZFLIX</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1DB954">
-    <style>
-    #search { padding: 10px; font-size: 16px; }
-    .tabs button {
-        background: #333; color: white; border: none; padding: 10px 20px;
-        margin: 5px; cursor: pointer; border-radius: 5px;
-    }
-    .tabs button.active { background: crimson; }
-
-    .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-    .movie { width: 150px; cursor: pointer; transition: 0.3s; }
-    .movie:hover { transform: scale(1.05); }
-    .movie img { width: 100%; border-radius: 8px; }
-
-    #playerContainer {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #000; display: none; justify-content: center; align-items: center;
-    }
-    iframe { width: 80vw; height: 80vh; border: 2px solid white; }
-    .close-btn {
-      position: absolute; top: 10px; right: 10px; font-size: 20px;
-      background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EDZFLIX</title>
+<style>
+body{background:#000;color:#fff;font-family:Arial;margin:0;padding:10px}
+.tabs{display:flex;gap:10px;margin:10px 0}
+.tabs button{padding:10px 20px;border:none;border-radius:8px;background:#222;color:#fff;cursor:pointer}
+.tabs button.active{background:#1DB954}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.card{background:#222;border-radius:10px;overflow:hidden;cursor:pointer}
+.card img{width:100%}
+.card p{padding:5px;font-size:12px;text-align:center}
+#playerContainer{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:none;flex-direction:column}
+#iframePlayer{width:100%;height:100%;border:none}
+.close-btn{position:absolute;top:10px;right:10px;z-index:10000;background:red;color:#fff;border:none;padding:10px;border-radius:5px}
+.live-box{width:100%;background:#222;padding:20px;border-radius:10px;text-align:center;cursor:pointer}
+</style>
 </head>
 <body>
-  <h1 style="color:#1DB954; font-weight:900; letter-spacing:3px; text-align:center;">EDZ<span style="color:white">FLIX</span></h1>
-
-  
+<h1 style="text-align:center;color:#1DB954">EDZ</h1>
 <div class="tabs">
-  <button id="moviesTab" class="active" onclick="switchTab('movie')">Movies</button>
-  <button id="tvTab" onclick="switchTab('tv')">TV Shows</button>
-  <button id="liveTab" onclick="switchTab('live')">🔴 LIVE CHANNELS</button>
+<button id="moviesTab" class="active" onclick="switchTab('movie')">Movies</button>
+<button id="tvTab" onclick="switchTab('tv')">TV Shows</button>
+<button id="liveTab" onclick="switchTab('live')">🔴 LIVE CHANNELS</button>
 </div>
-  <input type="text" id="search" placeholder="Search..." oninput="searchContent()"/>
-  <div id="movies" class="grid"></div><div id="live" class="grid" style="display:none;"><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">📺<br>GMA<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">📺<br>TV5<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">🏀<br>PBA<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">🏀<br>NBA<br><span style="color:#1DB954;">● LIVE</span></div></div>
-<div id="tv" class="grid" style="display:none;"></div>
-
-  <div id="playerContainer">
-    <button class="close-btn" onclick="closePlayer()">X</button>
-    <iframe id="iframePlayer" allowfullscreen></iframe>
-  </div>
-
-  <script>
-    const API_KEY = '488eb36776275b8ae18600751059fb49';
-    const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-    let currentType = 'movie'; // 'movie' or 'tv'
-
-    async function fetchContent(url) {
-      const res = await fetch(url);
-      const data = await res.json();
-      displayContent(data.results);
-    }
-
-    function displayContent(items) {
-      const moviesDiv = document.getElementById("movies");
-      moviesDiv.innerHTML = "";
-      items.forEach(item => {
-        const title = currentType === 'movie' ? item.title : item.name;
-        const poster = item.poster_path ? IMG_URL + item.poster_path : '';
-        const movieEl = document.createElement("div");
-        movieEl.classList.add("movie");
-        movieEl.innerHTML = `
-          <img src="${poster}" alt="${title}">
-          <p>${title}</p>
-        `;
-        movieEl.onclick = () => loadPlayer(item.id);
-        moviesDiv.appendChild(movieEl);
-      });
-    }
-
-let currentMovieId = null;
-const servers = [
-  { name: "Server 1", url: (id, type) => type==='movie'? `https://vidlink.pro/movie/${id}?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` : `https://vidlink.pro/tv/${id}/1/1?primaryColor=1DB954&secondaryColor=191414&icons=vid&poster=true&autoplay=true&nextButton=false` },
-    { name: "Server 2", url: (id, type) => type==='movie'? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/1/1` },
-  { name: "Server 3", url: (id, type) => type==='movie'? `https://autoembed.co/movie/tmdb/${id}` : `https://autoembed.co/tv/tmdb/${id}-1-1` }
-];
-let activeServer = 0;
-function changeServer(n){
-  activeServer = n;
-  const src = servers[n].url(currentMovieId, currentType);
-  document.getElementById("iframePlayer").src = src;
-  document.querySelectorAll('.server-btn').forEach((b,i)=>{ b.style.background = i===n? 'crimson' : '#333'; });
+<input type="text" id="search" placeholder="Search..." style="width:100%;padding:10px;margin-bottom:15px;border-radius:8px;border:none" onkeyup="if(event.key==='Enter')searchContent()">
+<div id="movies" class="grid"></div>
+<div id="tv" class="grid" style="display:none"></div>
+<div id="live" class="grid" style="display:none">
+<div class="live-box" onclick="alert('GMA Live - Coming Soon!')">📺<br>GMA<br><span style="color:#1DB954">● LIVE</span></div>
+<div class="live-box" onclick="alert('TV5 Live - Coming Soon!')">📺<br>TV5<br><span style="color:#1DB954">● LIVE</span></div>
+<div class="live-box" onclick="alert('Kapamilya - Coming Soon!')">🎬<br>A2Z<br><span style="color:#1DB954">● LIVE</span></div>
+<div class="live-box" onclick="alert('PBA Live - Coming Soon!')">🏀<br>PBA<br><span style="color:#1DB954">● LIVE</span></div>
+<div class="live-box" onclick="alert('NBA Live - Coming Soon!')">🏀<br>NBA<br><span style="color:#1DB954">● LIVE</span></div>
+<div class="live-box" onclick="alert('Cartoon - Coming Soon!')">🎨<br>Cartoon<br><span style="color:#1DB954">● LIVE</span></div>
+</div>
+<div id="playerContainer">
+<button class="close-btn" onclick="closePlayer()">X Close</button>
+<iframe id="iframePlayer" allowfullscreen></iframe>
+<div style="text-align:center;padding:10px;background:#111">
+<button onclick="document.getElementById('iframePlayer').requestFullscreen()" style="padding:10px 20px;background:#1DB954;border:none;border-radius:8px;color:#fff">⛶ Fullscreen</button>
+</div>
+</div>
+<script>
+const API_KEY='488eb36776275b8ae18600751059f6d6f0e4b0d8e1';
+const IMG_URL='https://image.tmdb.org/t/p/w500';
+async function fetchContent(url){
+const res=await fetch(url);const data=await res.json();displayContent(data.results,document.getElementById(currentType==='tv'?'tv':'movies'))
 }
-function loadPlayer(id) {
-  currentMovieId = id;
-  activeServer = 0;
-  const src = servers[0].url(id, currentType);
-  document.getElementById("iframePlayer").src = src;
-  document.getElementById("playerContainer").style.display = "flex";
-  if(!document.getElementById('serverTabs')){
-    const tabs = document.createElement('div');
-    tabs.id = 'serverTabs';
-    tabs.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-bottom:10px;';
-      tabs.innerHTML = servers.map((s,i)=>`<button class="server-btn" onclick="changeServer(${i})" style="background:${i===0?'crimson':'#333'};color:white;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;">${s.name}</button>`).join('') + `<button onclick="document.getElementById('playerContainer').requestFullscreen()" style="background:#1DB954;color:white;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;margin-left:10px;">⛶ Fullscreen</button>`;
-    document.getElementById("playerContainer").insertBefore(tabs, document.getElementById("iframePlayer"));
-  } else {
-    changeServer(0);
-  }
+function displayContent(items,container){
+container.innerHTML='';
+items.forEach(item=>{
+const div=document.createElement('div');div.className='card';
+div.innerHTML=`<img src="${IMG_URL+item.poster_path}" onerror="this.src='https://via.placeholder.com/150'"><p>${item.title||item.name}</p>`;
+div.onclick=()=>openPlayer(item.id);
+container.appendChild(div);
+})
 }
-    function closePlayer() {
-      document.getElementById("playerContainer").style.display = "none";
-      document.getElementById("iframePlayer").src = "";
-    }
-
-    function searchContent() {
-      const query = document.getElementById("search").value.trim();
-      if (query.length > 2) {
-        fetchContent(`https://api.themoviedb.org/3/search/${currentType}?api_key=${API_KEY}&query=${query}`);
-      } else {
-        fetchPopular();
-      }
-    }
-
-    function fetchPopular() {
-      fetchContent(`https://api.themoviedb.org/3/${currentType}/popular?api_key=${API_KEY}`);
-    }
-
-    function switchTab(type) {
-      currentType = type;
-      document.getElementById("moviesTab").classList.toggle("active", type === 'movie');
-      document.getElementById("tvTab").classList.toggle("active", type === 'tv');
-      document.getElementById("search").value = '';
-      fetchPopular();
-    }
-
-    // Load default content
-    fetchPopular();
-  </script>
+function openPlayer(id){
+document.getElementById('playerContainer').style.display='flex';
+document.getElementById('iframePlayer').src=`https://vidlink.pro/movie/${id}`;
+}
+function closePlayer(){
+document.getElementById('playerContainer').style.display='none';
+document.getElementById('iframePlayer').src='';
+}
+let currentType='movie';
+function switchTab(tab){
+document.getElementById('movies').style.display=tab==='movie'?'grid':'none';
+document.getElementById('tv').style.display=tab==='tv'?'grid':'none';
+document.getElementById('live').style.display=tab==='live'?'grid':'none';
+document.getElementById('moviesTab').classList.toggle('active',tab==='movie');
+document.getElementById('tvTab').classList.toggle('active',tab==='tv');
+document.getElementById('liveTab').classList.toggle('active',tab==='live');
+currentType=tab;
+if(tab==='movie')fetchContent(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+if(tab==='tv')fetchContent(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`);
+}
+function searchContent(){
+const q=document.getElementById('search').value;
+if(!q)return;
+fetchContent(`https://api.themoviedb.org/3/search/${currentType==='tv'?'tv':'movie'}?api_key=${API_KEY}&query=${q}`);
+}
+switchTab('movie');
+</script>
 </body>
 </html>
