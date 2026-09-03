@@ -33,13 +33,15 @@
 <body>
   <h1 style="color:#1DB954; font-weight:900; letter-spacing:3px; text-align:center;">EDZ<span style="color:white">FLIX</span></h1>
 
-  <div class="tabs">
-    <button id="moviesTab" class="active" onclick="switchTab('movie')">Movies</button>
-    <button id="tvTab" onclick="switchTab('tv')">TV Shows</button>    <button id="liveTab" onclick="switchTab('live')">🔴 LIVE CHANNELS</button>
-  </div>
-
+  
+<div class="tabs">
+  <button id="moviesTab" class="active" onclick="switchTab('movie')">Movies</button>
+  <button id="tvTab" onclick="switchTab('tv')">TV Shows</button>
+  <button id="liveTab" onclick="switchTab('live')">🔴 LIVE CHANNELS</button>
+</div>
   <input type="text" id="search" placeholder="Search..." oninput="searchContent()"/>
-  <div id="movies" class="grid"></div>
+  <div id="movies" class="grid"></div><div id="live" class="grid" style="display:none;"><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">📺<br>GMA<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">📺<br>TV5<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">🏀<br>PBA<br><span style="color:#1DB954;">● LIVE</span></div><div style="width:150px;background:#222;padding:20px;border-radius:10px;text-align:center;color:white;">🏀<br>NBA<br><span style="color:#1DB954;">● LIVE</span></div></div>
+<div id="tv" class="grid" style="display:none;"></div>
 
   <div id="playerContainer">
     <button class="close-btn" onclick="closePlayer()">X</button>
